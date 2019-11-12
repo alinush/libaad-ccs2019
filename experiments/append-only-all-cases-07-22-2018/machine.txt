@@ -1,0 +1,6 @@
+Memory optimized
+r4.16xlarge
+64 vCPUs
+488 GB of RAM
+EBS only
+25 Gigabit

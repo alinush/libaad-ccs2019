@@ -1,0 +1,58 @@
+#pragma once
+
+#include <stdexcept>
+
+// NOTE: Instead of modifying this file, just build using `cmake -DCMAKE_BUILD_TYPE=Trace` which will define TRACE for you
+//#define TRACE
+
+// Some compilers have different #define's for C++11's noexcept
+
+#ifdef _GLIBCXX_NOEXCEPT
+# define _NOEXCEPT _GLIBCXX_USE_NOEXCEPT
+#else
+# ifndef _NOEXCEPT
+#  error "_NOEXCEPT is not defined"
+# endif
+#endif
+
+/** Project version. */
+#define LIBAAD_VERSION "@VERSION@"
+
+// /** Debugging support. */
+// #cmakedefine DEBUG
+// /** Verbose error messages. */
+// #cmakedefine VERBS
+// /** Trace support. */
+// #cmakedefine TRACE
+// /** Build documentation. */
+// #cmakedefine DOCUM
+// /** Build shared library. */
+// #cmakedefine SHLIB
+// /** Build static library. */
+// #cmakedefine STLIB
+
+///** Number of available cores. */
+//#define CORES    @CORES@
+//
+///** Architecture. */
+//#cmakedefine ARCH	 @ARCH@
+
+// /** GNU/Linux operating system. */
+// #define LINUX    1
+// /** FreeBSD operating system. */
+// #define FREEBSD  2
+// /** Windows operating system. */
+// #define MACOSX   3
+// /** Windows operating system. */
+// #define WINDOWS  4
+// /** Android operating system. */
+// #define DROID    5
+// /* Arduino platform. */
+// #define DUINO    6
+// /** Detected operation system. */
+// #cmakedefine OPSYS    @OPSYS@
+
+/**
+ * Prints the project options selected at build time.
+ */
+// void conf_print(void);

@@ -1,0 +1,15 @@
+*.o
+*~
+*.a
+*.so
+*.d
+/build
+depinst/
+depsrc/
+README.html
+CHANGELOG.html
+doxygen/
+/Testing
+core
+tmp
+.DS_Store
