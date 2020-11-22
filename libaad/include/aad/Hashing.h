@@ -11,13 +11,6 @@
 
 #include <xassert/XAssert.h>
 
-namespace boost {
-    template <typename B, typename A>
-    std::size_t hash_value(const boost::dynamic_bitset<B, A>& bs) {
-        return boost::hash_value(bs.m_bits);
-    }
-}
-
 using libaad::Fr;
 using libaad::G1;
 

@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <deque>
+#include <random>
 #include <algorithm>
 
 #include <boost/unordered_map.hpp>
@@ -25,12 +26,14 @@ using std::endl;
  * dictSize, totalMembBytes, forestMembBytes, frontierMembBytes, totalNonMembBytes,
  */
 
+std::mt19937 *urng;
+
 void benchMembProofSize(int dictSize, int numSamples, const std::vector<int>& numValues, const std::string& fileName, bool progress = false);
 
 int main(int argc, char *argv[])
 {
     int numSamples = 10, dictSize = 1023;
-    unsigned int seed = 42;
+    std::string seedStr = "42";
     std::vector<int> numValues = {0, 1, 2, 4, 8, 16, 32};
 
     initialize(nullptr, 0);
@@ -40,14 +43,19 @@ int main(int argc, char *argv[])
             std::cout << "Usage: " << argv[0] << " [dictSize] [randSeed]" << endl;
             return 0;
         }
+        auto oldDictSize = dictSize;
         dictSize = std::stoi(argv[1]);
+        loginfo << "Chaging dictionary size from " << oldDictSize << " to " << dictSize << endl;
     }
     if(argc > 2) {
-        seed = static_cast<unsigned int>(std::stoi(argv[2]));
+        seedStr.assign(argv[2]);
     }
+    unsigned int seed = static_cast<unsigned int>(std::stoi(seedStr.c_str()));
     
-    loginfo << "Seeding srand() with " << seed << "..." << endl;
+    loginfo << "Seeding srand() with " << seedStr << "..." << endl;
     srand(seed);
+    std::seed_seq seedseq(seedStr.begin(), seedStr.end());
+    urng = new std::mt19937(seedseq);
     
     loginfo << "Benchmarking complete membership proof sizes for AADs of size " << dictSize << endl;
     loginfo << "Sampling a different key " << numSamples << " times" << endl;
@@ -97,10 +105,9 @@ void benchMembProofSize(int dictSize, int numSamples, const std::vector<int>& nu
     // generate random sequence of keys, with repeats, since a key will be inserted multiple times with a different value
     std::vector<std::string> keys;
     initKeys(keys, numSamples, numValues);
-    // shuffle keys
-    std::random_shuffle(keys.begin(), keys.end(), [](int i) {
-        return rand() % i;
-    });
+    // WARNING: We shuffle the keys using std::shuffle because std::random_shuffle is deprecated in C++14
+    std::shuffle(keys.begin(), keys.end(), *urng);
+
     auto keyIt = keys.begin();
     boost::unordered_map<std::string, std::list<std::string>> keyToValues;
 

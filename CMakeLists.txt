@@ -45,6 +45,10 @@ if(${CURVE} STREQUAL "BN128")
   )
 endif()
 
+# OS X Catalina fix
+include_directories(SYSTEM "/usr/local/include")
+link_directories("/usr/local/lib")
+
 # some fix I needed to hash boost::dynamic_bitset's
 add_definitions(-DBOOST_DYNAMIC_BITSET_DONT_USE_FRIENDS)
 

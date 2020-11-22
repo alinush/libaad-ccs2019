@@ -15,6 +15,19 @@ elif [ "$1" == "clean" ]; then
     CLEAN_BUILD=1
 fi
 
+echo "OS: $OS"
+echo "OS flavor: $OS_FLAVOR"
+CMAKE_CXX_FLAGS=
+if [ "$OS" = "OSX" -a "$OS_FLAVOR" = "Catalina" ]; then
+    echo "Setting proper env. vars for compiling against OpenSSL in OS X Catalina"
+    export PKG_CONFIG_PATH="/usr/local/opt/openssl@1.1/lib/pkgconfig"
+
+    # NOTE: None of these seem to help cmake find OpenSSL
+    #export LDFLAGS="-L/usr/local/opt/openssl@1.1/lib"
+    #export CXXFLAGS="-I/usr/local/opt/openssl@1.1/include"
+    #CMAKE_CXX_FLAGS="$CMAKE_CXX_FLAGS -I/usr/local/opt/openssl@1.1/include"
+fi
+
 # NOTE: Seemed like setting this to OFF caused a simple cout << G1::zero(); to segfault but it was just that I forgot to call init_public_params()
 BINARY_OUTPUT=OFF
 NO_PT_COMPRESSION=ON
@@ -62,6 +75,7 @@ cd $sourcedir/depends
 
 # NOTE TO SELF: After one day of trying to get CMake to add these using ExternalProject_Add (or add_subdirectory), I give up.
 
+echo "ate-pairing..."
 (
     cd ate-pairing/
     if [ $CLEAN_BUILD -eq 1 ]; then
@@ -89,6 +103,7 @@ cd $sourcedir/depends
     #sudo cp lib/zm.so "$LIB_DIR/libzm.so"
 )
 
+echo "Libff..."
 (
     cd libff/
     if [ $CLEAN_BUILD -eq 1 ]; then
@@ -105,7 +120,7 @@ cd $sourcedir/depends
         -DIS_LIBFF_PARENT=OFF \
         -DBINARY_OUTPUT=$BINARY_OUTPUT \
         -DNO_PT_COMPRESSION=$NO_PT_COMPRESSION \
-        -DCMAKE_CXX_FLAGS="-Wno-unused-parameter -Wno-unused-value -Wno-unused-variable -I$sourcedir" \
+        -DCMAKE_CXX_FLAGS="-Wno-unused-parameter -Wno-unused-value -Wno-unused-variable -I$sourcedir $CMAKE_CXX_FLAGS" \
         -DUSE_ASM=ON \
         -DPERFORMANCE=OFF \
         -DMULTICORE=$MULTICORE \

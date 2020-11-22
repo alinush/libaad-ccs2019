@@ -103,6 +103,7 @@ public:
         DataType(PublicParameters * pp, AccTreePtrType at, int size, bool computeFrontier)
             : DataType(size)
         {
+            //logdbg << "DataType(" << size << "), frontier = " << computeFrontier << endl;
             bool simulate = pp == nullptr;
             this->at.reset(at);
 
@@ -310,8 +311,12 @@ public:
             //ManualTimer t2;
 
             // Automatically computes frontier if this is the last merge (and its the last append in a batch)
-            int parentLevel = leftNode->getHeight();    // parent will be one level higher than child (leaves are at level 1)
-            bool haveFullBatch = parentLevel - 1 >= Utils::log2floor(batchSize); // e.g., when batchSize = 2 log2floor will be 1 => parent of two leaves has parentLevel = 2
+            int parentLevel = leftNode->getHeight() + 1;    // parent will be one level higher than child (leaves are at level 1)
+            bool haveFullBatch = parentLevel - 1 >= Utils::log2floor(batchSize); // e.g., when batchSize = 2, log2floor will be 1 => parent of two leaves has parentLevel = 2
+            //logdbg << "parentLevel - 1: " << parentLevel - 1 << endl;
+            //logdbg << "batchSize: " << batchSize << endl;
+            //logdbg << "log2floor(" << batchSize << "): " << Utils::log2floor(batchSize) << endl;
+            //logdbg << "haveFullBatch: " << haveFullBatch << endl;
             auto data = new DataType(pp, at, left->size + right->size, isLastMerge && haveFullBatch);
             //std::chrono::milliseconds mus2 = std::chrono::duration_cast<std::chrono::milliseconds>(t2.stop());
 
@@ -432,6 +437,10 @@ public:
         for(auto tup : trees) {
             auto rootNode = std::get<1>(tup);
             auto data = rootNode->data.get();
+            assertNotNull(data);
+            if(EnableFrontier) {
+                assertNotNull(data->frontier);
+            }
             d.push_back(std::make_tuple(
                 data->acc,
                 EnableFrontier ? data->frontier->getRootAcc() : G1::zero(),
